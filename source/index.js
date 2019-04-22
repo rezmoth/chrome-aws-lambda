@@ -3,6 +3,37 @@ const { get } = require('https');
 const { URL } = require('url');
 
 class Chromium {
+
+  static async initFontCJK() {
+    if (this.headless !== true) {
+      return null;
+    }
+
+    if (process.env.HOME === undefined) {
+      process.env.HOME = '/tmp';
+    }
+
+    if (existsSync(`${process.env.HOME}/.fonts`) !== true) {
+      mkdirSync(`${process.env.HOME}/.fonts`);
+    }
+
+    return new Promise((resolve, reject) => { 
+      let source = `${__dirname}/NotoSansCJK-Regular.ttc`;
+      let dest = `${process.env.HOME}/.fonts/NotoSansCJK-Regular.ttc`;
+
+      let readStream = createReadStream(source);
+  
+      readStream.once('error', (err) => {
+      	return reject(err);	
+      });
+
+      readStream.once('end', () => {
+        resolve(dest);
+      });
+    
+      readStream.pipe(createWriteStream(dest));
+    });
+  }
   /**
    * Downloads a custom font and returns its basename, patching the environment so that Chromium can find it.
    * If not running on AWS Lambda nor Google Cloud Functions, `null` is returned instead.
