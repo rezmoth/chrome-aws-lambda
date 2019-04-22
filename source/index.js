@@ -28,7 +28,7 @@ class Chromium {
       });
 
       readStream.once('end', () => {
-        resolve(dest);
+        return resolve(dest);
       });
     
       readStream.pipe(createWriteStream(dest));
